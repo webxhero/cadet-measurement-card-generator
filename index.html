@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Frontend-only Cadet Measurement Card Generator with A4 print and PDF support.">
+  <title>ক্যাডেট মেজারমেন্ট কার্ড জেনারেটর</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell no-print">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">CADET ADMIN TOOL By CUO Shahid</p>
+        <h1>ক্যাডেট মেজারমেন্ট কার্ড</h1>
+        <p class="subtitle">ক্যাডেটদের মাপ সংরক্ষণ করুন এবং A4 ফরম্যাটে প্রিন্ট / PDF তৈরি করুন।</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-primary" id="printBtn" type="button">প্রিন্ট / PDF</button>
+        <button class="btn btn-secondary" id="exportBtn" type="button">ডাটা এক্সপোর্ট</button>
+        <button class="btn btn-secondary" id="importBtn" type="button">ডাটা ইমপোর্ট</button>
+        <input id="importFile" type="file" accept="application/json,.json" hidden>
+      </div>
+    </header>
+
+    <main>
+      <section class="dashboard-grid">
+        <div class="panel form-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">DATA ENTRY</p>
+              <h2>ক্যাডেটের মাপ যোগ করুন</h2>
+            </div>
+            <button class="btn btn-danger btn-small" id="clearAllBtn" type="button">সব মুছুন</button>
+          </div>
+
+          <form id="measurementForm" novalidate>
+            <div class="form-section">
+              <h3>ব্যক্তিগত তথ্য</h3>
+              <div class="form-grid personal-grid">
+                <div class="field field-wide">
+                  <label for="name">নাম <span>*</span></label>
+                  <input id="name" name="name" type="text" autocomplete="name" placeholder="মোঃ সাহিদ" required>
+                </div>
+                <div class="field">
+                  <label for="cadetNumber">ক্যাডেট নম্বর <span>*</span></label>
+                  <input id="cadetNumber" name="cadetNumber" type="text" inputmode="numeric" placeholder="1024" required>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3>শার্টের মাপ</h3>
+              <div class="form-grid measurements-grid">
+                <div class="field"><label for="shirtLength">লম্বা</label><input id="shirtLength" type="text" inputmode="decimal" placeholder="29"></div>
+                <div class="field"><label for="shirtBody">বডি</label><input id="shirtBody" type="text" inputmode="decimal" placeholder="38.5"></div>
+                <div class="field"><label for="shirtCuff">কাফ</label><input id="shirtCuff" type="text" inputmode="decimal" placeholder="9"></div>
+                <div class="field"><label for="shirtHand">হাত</label><input id="shirtHand" type="text" inputmode="decimal" placeholder="24"></div>
+                <div class="field"><label for="shirtPet">পেট</label><input id="shirtPet" type="text" inputmode="decimal" placeholder="35"></div>
+                <div class="field"><label for="shirtHip">হিপ</label><input id="shirtHip" type="text" inputmode="decimal" placeholder="39"></div>
+                <div class="field"><label for="shirtCollar">কলার</label><input id="shirtCollar" type="text" inputmode="decimal" placeholder="6"></div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3>প্যান্টের মাপ</h3>
+              <div class="form-grid measurements-grid">
+                <div class="field"><label for="pantLength">লম্বা</label><input id="pantLength" type="text" inputmode="decimal" placeholder="37"></div>
+                <div class="field"><label for="pantRun">রান</label><input id="pantRun" type="text" inputmode="decimal" placeholder="27"></div>
+                <div class="field"><label for="pantHigh">হাই</label><input id="pantHigh" type="text" inputmode="decimal" placeholder="26.5"></div>
+                <div class="field"><label for="pantWaist">কোমর</label><input id="pantWaist" type="text" inputmode="decimal" placeholder="34"></div>
+                <div class="field"><label for="pantMuri">মুরি</label><input id="pantMuri" type="text" inputmode="decimal" placeholder="14"></div>
+                <div class="field"><label for="pantHip">হিপ</label><input id="pantHip" type="text" inputmode="decimal" placeholder="39.5"></div>
+              </div>
+            </div>
+
+            <div class="form-footer">
+              <p class="helper-text">মাপ ফাঁকা রাখা যাবে। দশমিক, ভগ্নাংশ এবং ½ সমর্থিত।</p>
+              <div class="form-actions">
+                <button class="btn btn-ghost hidden" id="cancelEditBtn" type="button">এডিট বাতিল</button>
+                <button class="btn btn-primary btn-large" id="submitBtn" type="submit">মাপ যোগ করুন</button>
+              </div>
+            </div>
+            <div id="formMessage" class="form-message" role="alert" aria-live="polite"></div>
+          </form>
+        </div>
+
+        <aside class="panel summary-panel">
+          <div class="panel-heading compact">
+            <div>
+              <p class="eyebrow">OVERVIEW</p>
+              <h2>সারাংশ</h2>
+            </div>
+          </div>
+
+          <div class="summary-cards">
+            <div class="summary-card">
+              <span>মোট ক্যাডেট</span>
+              <strong id="cadetCount">0</strong>
+            </div>
+            <div class="summary-card">
+              <span>মোট পেজ</span>
+              <strong id="pageCount">0</strong>
+            </div>
+          </div>
+
+          <div class="setting-row">
+            <label for="cardsPerPage">প্রতি পেজে কার্ড</label>
+            <select id="cardsPerPage">
+              <option value="9">9 Cards</option>
+              <option value="12" selected>12 Cards</option>
+            </select>
+          </div>
+
+          <div class="storage-note">
+            <strong>লোকাল স্টোরেজ সক্রিয়</strong>
+            <p>এই অ্যাপে কোনো সার্ভার বা ডাটাবেজ নেই। তথ্য এই ব্রাউজারেই সংরক্ষিত থাকবে।</p>
+          </div>
+        </aside>
+      </section>
+    </main>
+  </div>
+
+  <section class="preview-shell" aria-labelledby="previewTitle">
+    <div class="preview-heading no-print">
+      <div>
+        <p class="eyebrow">DOCUMENT PREVIEW</p>
+        <h2 id="previewTitle">প্রিন্ট প্রিভিউ</h2>
+      </div>
+      <span class="preview-meta" id="previewMeta">A4 • 12 Cards/Page</span>
+    </div>
+    <div id="emptyState" class="empty-state no-print">
+      <div class="empty-icon" aria-hidden="true">＋</div>
+      <h3>এখনও কোনো ক্যাডেট যোগ করা হয়নি।</h3>
+      <p>উপরে ফর্ম পূরণ করে “মাপ যোগ করুন” চাপুন।</p>
+    </div>
+    <div id="printArea" class="print-area" aria-live="polite"></div>
+  </section>
+
+  <noscript>
+    <div class="noscript-message">এই অ্যাপটি চালাতে JavaScript চালু থাকতে হবে।</div>
+  </noscript>
+
+  <script src="script.js"></script>
+</body>
+</html>
